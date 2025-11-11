@@ -14,7 +14,7 @@
     in {
       packages = {
         default = pkgs.callPackage ./package.nix {};
-        xinux-plymouth = pkgs.callPackage ./package.nix {};
+        xinux = pkgs.callPackage ./package.nix {};
       };
 
       devShells.default = pkgs.mkShell {
@@ -27,7 +27,7 @@
     })
     // {
       overlays.default = final: prev: {
-         xinux-plymouth = final.callPackage ./package.nix {};
+         xinux = final.callPackage ./package.nix {};
       };
     };
 }
