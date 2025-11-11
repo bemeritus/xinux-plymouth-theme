@@ -1,21 +1,33 @@
 {
-  description = "BowlBird Logo Plymouth Theme";
+  description = "Mac-style NixOS Plymouth Theme";
 
-  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-
-  outputs = { self, nixpkgs, ... }: {
-    defaultPackage.x86_64-linux =
-    with import nixpkgs { system = "x86_64-linux"; };
-    stdenv.mkDerivation {
-      pname = "xinux-plymouth-theme";
-      version = "1.0.0";
-      src = ./xinux;
-      dontBuild = true;
-      installPhase = ''
-        mkdir -p $out/share/plymouth/themes/xinux
-        cp * $out/share/plymouth/themes/xinux
-        find $out/share/plymouth/themes/ -name \*.plymouth -exec sed -i "s@\/usr\/@$out\/@" {} \;
-      '';
-    };
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs";
+    flake-utils.url = "github:numtide/flake-utils";
   };
+
+  outputs = { nixpkgs, flake-utils, ... }:
+    with flake-utils.lib; eachDefaultSystem (system: let
+      pkgs = import nixpkgs {
+        inherit system;
+      };
+    in {
+      packages = {
+        default = pkgs.callPackage ./package.nix {};
+        xinux-plymouth = pkgs.callPackage ./package.nix {};
+      };
+
+      devShells.default = pkgs.mkShell {
+        name = "plymouth-test";
+        packages = with pkgs; [
+          plymouth
+          (pkgs.writeShellScriptBin "show" (builtins.readFile ./showplaymouth.sh))
+        ];
+      };
+    })
+    // {
+      overlays.default = final: prev: {
+         xinux-plymouth = final.callPackage ./package.nix {};
+      };
+    };
 }
