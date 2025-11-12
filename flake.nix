@@ -3,7 +3,7 @@
   description = "Flake for adi1090x Plymouth themes (with optional selected themes)";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
   };
 
   outputs = { self, nixpkgs }:
@@ -11,10 +11,7 @@
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
 
-
-      selectedThemes = [ "mac_style"]; # misol uchun
-      # selectedThemes = [ ]; # hammasini olish uchun
-
+      selectedThemes = [ "mac_style"];
 
       themeShas = import ./shas.nix;
       knownThemes = builtins.attrNames themeShas;
