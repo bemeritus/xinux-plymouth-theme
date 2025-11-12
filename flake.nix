@@ -1,19 +1,34 @@
 {
-  description = "Flake for Xinux plymouth";
+  description = "A beginning of an awesome project bootstrapped with github:bleur-org/templates";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    # Stable for keeping thins clean
+    # nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
+
+    # # Fresh and new for testing
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+
+    # The flake-utils library
+    flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs }:
-    let
-      system = "x86_64-linux";
-      pkgs = import nixpkgs {
-        inherit system;
-      };
-    in
-    {
-      packages.${system}.xinux-plymouth-theme = pkgs.callPackage ./default.nix { };
-      defaultPackage.${system} = self.packages.${system}.xinux-plymouth-theme;
-    };
+  outputs = {
+    self,
+    nixpkgs,
+    flake-utils,
+    ...
+  }:
+  # @ inputs
+    flake-utils.lib.eachDefaultSystem (system: let
+      pkgs = import nixpkgs {inherit system;};
+    in {
+      # Nix script formatter
+      formatter = pkgs.alejandra;
+
+      # Development environment
+      # devShells.default = import ./shell.nix {inherit pkgs;};
+
+      # Output package
+      packages.default = pkgs.callPackage ./. {};
+    });
 }
