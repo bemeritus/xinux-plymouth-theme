@@ -1,9 +1,0 @@
-[Plymouth Theme]
-Name=xinux
-Description=display Xinux logo
-Comment=created By BeMeritus (@bemeritus)
-ModuleName=script
-
-[script]
-ImageDir=/usr/share/plymouth/themes/mac-style
-ScriptFile=/usr/share/plymouth/themes/xinux/mac-style.script

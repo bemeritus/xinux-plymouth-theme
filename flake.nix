@@ -1,34 +1,33 @@
 {
-  description = "A beginning of an awesome project bootstrapped with github:bleur-org/templates";
+  description = "Mac-style NixOS Plymouth Theme";
 
   inputs = {
-    # Stable for keeping thins clean
-    # nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
-
-    # # Fresh and new for testing
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-
-    # The flake-utils library
+    nixpkgs.url = "github:NixOS/nixpkgs";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = {
-    self,
-    nixpkgs,
-    flake-utils,
-    ...
-  }:
-  # @ inputs
-    flake-utils.lib.eachDefaultSystem (system: let
-      pkgs = import nixpkgs {inherit system;};
+  outputs = { nixpkgs, flake-utils, ... }:
+    with flake-utils.lib; eachDefaultSystem (system: let
+      pkgs = import nixpkgs {
+        inherit system;
+      };
     in {
-      # Nix script formatter
-      formatter = pkgs.alejandra;
+      packages = {
+        default = pkgs.callPackage ./package.nix {};
+        mac-style-plymouth = pkgs.callPackage ./package.nix {};
+      };
 
-      # Development environment
-      # devShells.default = import ./shell.nix {inherit pkgs;};
-
-      # Output package
-      packages.default = pkgs.callPackage ./. {};
-    });
+      devShells.default = pkgs.mkShell {
+        name = "plymouth-test";
+        packages = with pkgs; [
+          plymouth
+          (pkgs.writeShellScriptBin "show" (builtins.readFile ./show-splash.sh))
+        ];
+      };
+    })
+    // {
+      overlays.default = final: prev: {
+        mac-style-plymouth = final.callPackage ./package.nix {};
+      };
+    };
 }
